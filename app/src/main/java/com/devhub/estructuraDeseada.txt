@@ -1,0 +1,52 @@
+com.devhub
+├── data
+│   ├── model
+│   │   ├── User.kt
+│   │   ├── Forum.kt
+│   │   └── Post.kt
+│   ├── repository
+│   │   ├── UserRepository.kt
+│   │   ├── ForumRepository.kt
+│   │   └── PostRepository.kt
+│   └── source
+│       ├── remote
+│       │   ├── FirebaseAuthSource.kt
+│       │   ├── FirestoreSource.kt
+│       │   ├── FirebaseStorageSource.kt
+│       │   └── RealtimeDatabaseSource.kt
+│       └── local (opcional)
+│           └── LocalDatabase.kt
+├── domain
+│   └── usecase
+│       ├── LoginUserUseCase.kt
+│       ├── RegisterUserUseCase.kt
+│       ├── GetForumsUseCase.kt
+│       ├── PostMessageUseCase.kt
+│       └── UpdateUserSettingsUseCase.kt
+├── ui
+│   ├── components
+│   │   ├── CommonButton.kt
+│   │   ├── CommonTextField.kt
+│   │   └── LoadingIndicator.kt
+│   ├── navigation
+│   │   └── NavGraph.kt
+│   ├── theme
+│   │   ├── Theme.kt
+│   │   ├── Colors.kt
+│   │   └── Typography.kt
+│   └── views
+│       ├── LoginActivity.kt
+│       ├── RegisterActivity.kt
+│       ├── MainActivity.kt
+│       ├── ForumDetailActivity.kt
+│       └── SettingsActivity.kt
+├── viewmodel
+│   ├── LoginViewModel.kt
+│   ├── RegisterViewModel.kt
+│   ├── MainViewModel.kt
+│   ├── ForumDetailViewModel.kt
+│   └── SettingsViewModel.kt
+└── utils
+    ├── Extensions.kt
+    ├── Constants.kt
+    └── Validators.kt

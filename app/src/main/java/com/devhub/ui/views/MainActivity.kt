@@ -6,6 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +46,8 @@ fun MainContent(modifier: Modifier = Modifier) {
     val secondaryColor = Blue1
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
+    var passwordVisibility by remember { mutableStateOf(false) }
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,6 +64,12 @@ fun MainContent(modifier: Modifier = Modifier) {
             value = emailState.value,
             onValueChange = { emailState.value = it },
             label = { Text("Gmail") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Email"
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -66,6 +79,18 @@ fun MainContent(modifier: Modifier = Modifier) {
             value = passwordState.value,
             onValueChange = { passwordState.value = it },
             label = { Text("Password") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Email"
+                )
+            },
+            trailingIcon = {
+                val image = if (passwordVisibility) Icons.Default.Clear else Icons.Default.Done
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    Icon(imageVector = image, contentDescription = "Mostrar/Ocultar contraseña")
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
