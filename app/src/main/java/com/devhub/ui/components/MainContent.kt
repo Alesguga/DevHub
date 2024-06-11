@@ -2,7 +2,6 @@ package com.devhub.ui.views
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -61,7 +60,8 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
+                shape = MaterialTheme.shapes.medium
             )
 
             OutlinedTextField(
@@ -87,7 +87,8 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 16.dp),
+                shape = MaterialTheme.shapes.medium
             )
 
             Button(
@@ -103,9 +104,13 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Iniciar sesión")
+                Text(
+                    "Iniciar sesión",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             Button(
@@ -122,10 +127,15 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 12.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Registrarse")
+                Text(
+                    "Registrarse",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
     }
 }
+
