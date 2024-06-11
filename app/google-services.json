@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "320123541482",
+    "project_id": "devhub-601c1",
+    "storage_bucket": "devhub-601c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320123541482:android:bd2c31158b10010c480493",
+        "android_client_info": {
+          "package_name": "com.devhub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpSt0Cvte8YK5Z-QS2F8aq0x_Fb2IHLjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
