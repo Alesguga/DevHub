@@ -1,4 +1,4 @@
-package com.devhub.ui.views
+package com.devhub.ui.components
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.devhub.R
-import com.devhub.ui.components.LogoText
 import com.devhub.ui.theme.Blue1
 import com.devhub.ui.theme.Gray1
 import com.devhub.viewmodel.LoginViewModel
@@ -32,6 +31,8 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
 
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -50,7 +51,10 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
 
             OutlinedTextField(
                 value = emailState.value,
-                onValueChange = { emailState.value = it },
+                onValueChange = {
+                    emailState.value = it
+                    emailError = !loginViewModel.isEmailValid(it)
+                },
                 label = { Text("Gmail") },
                 leadingIcon = {
                     Icon(
@@ -61,12 +65,23 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
+                isError = emailError,
                 shape = MaterialTheme.shapes.medium
             )
+            if (emailError) {
+                Text(
+                    text = "Email no válido. Usa Gmail, Hotmail, ProtonMail, Yahoo.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             OutlinedTextField(
                 value = passwordState.value,
-                onValueChange = { passwordState.value = it },
+                onValueChange = {
+                    passwordState.value = it
+                    passwordError = !loginViewModel.isPasswordValid(it)
+                },
                 label = { Text("Password") },
                 visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = {
@@ -88,8 +103,16 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
+                isError = passwordError,
                 shape = MaterialTheme.shapes.medium
             )
+            if (passwordError) {
+                Text(
+                    text = "La contraseña debe tener al menos 8 caracteres, incluyendo letras, números y símbolos.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
 
             Button(
                 onClick = {
@@ -119,7 +142,6 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                         if (isSuccess) {
                             navController.navigate("home_screen")
                             Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
-
                         } else {
                             Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
                         }
@@ -138,4 +160,3 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
         }
     }
 }
-

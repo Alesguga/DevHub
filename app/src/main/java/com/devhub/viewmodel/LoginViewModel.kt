@@ -1,4 +1,5 @@
 package com.devhub.viewmodel
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,17 @@ class LoginViewModel : ViewModel() {
     }
 
     fun register(email: String, password: String, onResult: (Boolean) -> Unit) {
+        if (!isEmailValid(email)) {
+            onResult(false)
+            println("Email no válido")
+            return
+        }
+        if (!isPasswordValid(password)) {
+            onResult(false)
+            println("Contraseña no válida")
+            return
+        }
+
         viewModelScope.launch {
             runCatching {
                 auth.createUserWithEmailAndPassword(email, password)
@@ -32,5 +44,15 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-}
 
+    fun isEmailValid(email: String): Boolean {
+        val validDomains = listOf("gmail.com", "hotmail.com", "protonmail.com", "yahoo.com")
+        val domain = email.substringAfter("@")
+        return domain in validDomains
+    }
+
+    fun isPasswordValid(password: String): Boolean {
+        val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z\\d@\$!%*#?&]{8,}\$")
+        return password.matches(passwordRegex)
+    }
+}

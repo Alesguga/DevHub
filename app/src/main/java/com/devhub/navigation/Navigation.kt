@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.devhub.ui.views.MainContent
+import com.devhub.ui.components.MainContent
 import com.devhub.ui.views.HomeScreen
 
 @Composable
