@@ -2,6 +2,7 @@ package com.devhub.ui.views
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -33,95 +34,98 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
     val passwordState = remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier.fillMaxSize()
     ) {
-        LogoText(primaryColor = primaryColor, secondaryColor = secondaryColor)
-
-        Spacer(modifier = Modifier.height(100.dp))
-
-        OutlinedTextField(
-            value = emailState.value,
-            onValueChange = { emailState.value = it },
-            label = { Text("Gmail") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = "Email"
-                )
-            },
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            LogoText(primaryColor = primaryColor, secondaryColor = secondaryColor)
 
-        OutlinedTextField(
-            value = passwordState.value,
-            onValueChange = { passwordState.value = it },
-            label = { Text("Password") },
-            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Password"
-                )
-            },
-            trailingIcon = {
-                val imageRes = if (passwordVisibility) R.drawable.ojoa else R.drawable.ojoc
-                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                    Image(
-                        painter = painterResource(id = imageRes),
-                        contentDescription = "Show/Hide Password",
-                        modifier = Modifier.size(20.dp)
+            Spacer(modifier = Modifier.height(100.dp))
+
+            OutlinedTextField(
+                value = emailState.value,
+                onValueChange = { emailState.value = it },
+                label = { Text("Gmail") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Email"
                     )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
 
-        Button(
-            onClick = {
-                loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
-                    if (isSuccess) {
-                        navController.navigate("home_screen")
-                        Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
+            OutlinedTextField(
+                value = passwordState.value,
+                onValueChange = { passwordState.value = it },
+                label = { Text("Password") },
+                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Password"
+                    )
+                },
+                trailingIcon = {
+                    val imageRes = if (passwordVisibility) R.drawable.ojoa else R.drawable.ojoc
+                    IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                        Image(
+                            painter = painterResource(id = imageRes),
+                            contentDescription = "Show/Hide Password",
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Iniciar sesión")
-        }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
 
-        Button(
-            onClick = {
-                loginViewModel.register(emailState.value, passwordState.value) { isSuccess ->
-                    if (isSuccess) {
-                        navController.navigate("home_screen")
-                        Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
-
-                    } else {
-                        Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
+            Button(
+                onClick = {
+                    loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
+                        if (isSuccess) {
+                            navController.navigate("home_screen")
+                            Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text("Registrarse")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Iniciar sesión")
+            }
+
+            Button(
+                onClick = {
+                    loginViewModel.register(emailState.value, passwordState.value) { isSuccess ->
+                        if (isSuccess) {
+                            navController.navigate("home_screen")
+                            Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
+
+                        } else {
+                            Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Registrarse")
+            }
         }
     }
 }
-
-
