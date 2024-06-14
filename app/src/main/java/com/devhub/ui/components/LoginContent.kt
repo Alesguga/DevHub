@@ -1,6 +1,9 @@
-package com.devhub.ui.components
+package com.devhub.ui.views
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -18,7 +21,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.devhub.R
+import com.devhub.ui.components.LogoText
 import com.devhub.ui.theme.Blue1
 import com.devhub.ui.theme.Gray1
 import com.devhub.viewmodel.LoginViewModel
@@ -30,9 +36,14 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
     val secondaryColor = Blue1
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
+    val usernameState = remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+        profileImageUri = it
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -55,7 +66,7 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                     emailState.value = it
                     emailError = !loginViewModel.isEmailValid(it)
                 },
-                label = { Text("Gmail") },
+                label = { Text("Email") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Email,
@@ -75,6 +86,16 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
+            OutlinedTextField(
+                value = usernameState.value,
+                onValueChange = { usernameState.value = it },
+                label = { Text("Nombre de Usuario") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                shape = MaterialTheme.shapes.medium
+            )
 
             OutlinedTextField(
                 value = passwordState.value,
@@ -115,36 +136,34 @@ fun MainContent(navController: NavController, loginViewModel: LoginViewModel = v
             }
 
             Button(
-                onClick = {
-                    loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
-                        if (isSuccess) {
-                            navController.navigate("home_screen")
-                            Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                },
+                onClick = { imageLauncher.launch("image/*") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                shape = MaterialTheme.shapes.medium
+                    .padding(vertical = 8.dp)
             ) {
-                Text(
-                    "Iniciar sesión",
-                    style = MaterialTheme.typography.bodyLarge
+                Text("Seleccionar Imagen de Perfil")
+            }
+            profileImageUri?.let {
+                Image(
+                    painter = rememberAsyncImagePainter(it),
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp)
                 )
             }
 
             Button(
                 onClick = {
-                    loginViewModel.register(emailState.value, passwordState.value) { isSuccess ->
-                        if (isSuccess) {
-                            navController.navigate("home_screen")
-                            Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
+                    if (profileImageUri != null) {
+                        loginViewModel.register(emailState.value, passwordState.value, usernameState.value, profileImageUri!!) { isSuccess ->
+                            if (isSuccess) {
+                                navController.navigate("home_screen")
+                                Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
+                            }
                         }
+                    } else {
+                        Toast.makeText(navController.context, "Selecciona una imagen de perfil", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier
