@@ -33,99 +33,128 @@ fun LoginForm(
     var passwordVisibility by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    var showResetButton by remember { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = emailState.value,
-        onValueChange = {
-            emailState.value = it
-            emailError = !loginViewModel.isEmailValid(it)
-        },
-        label = { Text("Email") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Email,
-                contentDescription = "Email"
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-        isError = emailError,
-        shape = MaterialTheme.shapes.medium
-    )
-    if (emailError) {
-        Text(
-            text = "Email no válido. Usa Gmail, Hotmail, ProtonMail, Yahoo.",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
+    Column {
+        OutlinedTextField(
+            value = emailState.value,
+            onValueChange = {
+                emailState.value = it
+                emailError = !loginViewModel.isEmailValid(it)
+            },
+            label = { Text("Email") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Email,
+                    contentDescription = "Email"
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            isError = emailError,
+            shape = MaterialTheme.shapes.medium
         )
-    }
-
-    OutlinedTextField(
-        value = passwordState.value,
-        onValueChange = {
-            passwordState.value = it
-            passwordError = !loginViewModel.isPasswordValid(it)
-        },
-        label = { Text("Password") },
-        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Lock,
-                contentDescription = "Password"
+        if (emailError) {
+            Text(
+                text = "Email no válido. Usa Gmail, Hotmail, ProtonMail, Yahoo.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
             )
-        },
-        trailingIcon = {
-            val imageRes = if (passwordVisibility) R.drawable.ojoa else R.drawable.ojoc
-            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                Image(
-                    painter = painterResource(id = imageRes),
-                    contentDescription = "Show/Hide Password",
-                    modifier = Modifier.size(20.dp)
+        }
+
+        OutlinedTextField(
+            value = passwordState.value,
+            onValueChange = {
+                passwordState.value = it
+                passwordError = !loginViewModel.isPasswordValid(it)
+            },
+            label = { Text("Password") },
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Password"
+                )
+            },
+            trailingIcon = {
+                val imageRes = if (passwordVisibility) R.drawable.ojoa else R.drawable.ojoc
+                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = "Show/Hide Password",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            isError = passwordError,
+            shape = MaterialTheme.shapes.medium
+        )
+        if (passwordError) {
+            Text(
+                text = "La contraseña debe tener al menos 8 caracteres, incluyendo letras, números y símbolos.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
+        Button(
+            onClick = {
+                loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
+                    if (isSuccess) {
+                        navController.navigate("home_screen")
+                        Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
+                    } else {
+                        if (loginViewModel.failedLoginAttempts >= 3) {
+                            showResetButton = true
+                        }
+                        Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text(
+                "Iniciar sesión",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        if (showResetButton) {
+            Button(
+                onClick = {
+                    loginViewModel.resetPassword(emailState.value) { isSuccess ->
+                        if (isSuccess) {
+                            Toast.makeText(navController.context, "Correo de restablecimiento enviado", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(navController.context, "Error al enviar el correo de restablecimiento", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(
+                    "Restablecer Contraseña",
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-        isError = passwordError,
-        shape = MaterialTheme.shapes.medium
-    )
-    if (passwordError) {
-        Text(
-            text = "La contraseña debe tener al menos 8 caracteres, incluyendo letras, números y símbolos.",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ClickableText(
+            text = AnnotatedString("¿No tienes una cuenta? Regístrate aquí"),
+            onClick = { onSwitchToRegister() },
+            style = MaterialTheme.typography.bodySmall.copy(color = secondaryColor)
         )
     }
-
-    Button(
-        onClick = {
-            loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
-                if (isSuccess) {
-                    navController.navigate("home_screen")
-                    Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
-                }
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Text(
-            "Iniciar sesión",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    ClickableText(
-        text = AnnotatedString("¿No tienes una cuenta? Regístrate aquí"),
-        onClick = { onSwitchToRegister() },
-        style = MaterialTheme.typography.bodySmall.copy(color = secondaryColor)
-    )
 }
