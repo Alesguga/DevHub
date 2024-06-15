@@ -1,6 +1,9 @@
-package com.devhub.ui.components
+package com.devhub.ui.components.loginComponents
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
@@ -17,22 +20,27 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.devhub.R
 import com.devhub.viewmodel.LoginViewModel
-
 @Composable
-fun LoginForm(
+fun RegisterForm(
     navController: NavController,
     loginViewModel: LoginViewModel,
     primaryColor: Color,
     secondaryColor: Color,
-    onSwitchToRegister: () -> Unit
+    onSwitchToLogin: () -> Unit
 ) {
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
+    val usernameState = remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+        profileImageUri = it
+    }
 
     OutlinedTextField(
         value = emailState.value,
@@ -60,6 +68,16 @@ fun LoginForm(
             style = MaterialTheme.typography.bodySmall
         )
     }
+
+    OutlinedTextField(
+        value = usernameState.value,
+        onValueChange = { usernameState.value = it },
+        label = { Text("Nombre de Usuario") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        shape = MaterialTheme.shapes.medium
+    )
 
     OutlinedTextField(
         value = passwordState.value,
@@ -100,14 +118,38 @@ fun LoginForm(
     }
 
     Button(
+        onClick = { imageLauncher.launch("image/*") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Text(
+            "Seleccionar Imagen de Perfil",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+    profileImageUri?.let {
+        Image(
+            painter = rememberAsyncImagePainter(it),
+            contentDescription = null,
+            modifier = Modifier.size(100.dp)
+        )
+    }
+
+    Button(
         onClick = {
-            loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
-                if (isSuccess) {
-                    navController.navigate("home_screen")
-                    Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
+            if (profileImageUri != null) {
+                loginViewModel.register(emailState.value, passwordState.value, usernameState.value, profileImageUri!!) { isSuccess ->
+                    if (isSuccess) {
+                        navController.navigate("home_screen")
+                        Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
+                    }
                 }
+            } else {
+                Toast.makeText(navController.context, "Selecciona una imagen de perfil", Toast.LENGTH_SHORT).show()
             }
         },
         modifier = Modifier
@@ -116,7 +158,7 @@ fun LoginForm(
         shape = MaterialTheme.shapes.medium
     ) {
         Text(
-            "Iniciar sesión",
+            "Registrarse",
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -124,8 +166,8 @@ fun LoginForm(
     Spacer(modifier = Modifier.height(16.dp))
 
     ClickableText(
-        text = AnnotatedString("¿No tienes una cuenta? Regístrate aquí"),
-        onClick = { onSwitchToRegister() },
+        text = AnnotatedString("¿Ya tienes una cuenta? Inicia sesión aquí"),
+        onClick = { onSwitchToLogin() },
         style = MaterialTheme.typography.bodySmall.copy(color = secondaryColor)
     )
 }

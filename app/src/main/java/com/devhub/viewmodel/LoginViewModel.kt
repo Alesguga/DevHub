@@ -13,19 +13,37 @@ class LoginViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
+    var failedLoginAttempts = 0
+        private set
 
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             runCatching {
                 auth.signInWithEmailAndPassword(email, password).await()
             }.onSuccess {
+                failedLoginAttempts = 0
                 onResult(true)
             }.onFailure {
+                failedLoginAttempts++
                 println("Error al iniciar sesión: ${it.message}")
                 onResult(false)
             }
         }
     }
+
+    fun resetPassword(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            runCatching {
+                auth.sendPasswordResetEmail(email).await()
+            }.onSuccess {
+                onResult(true)
+            }.onFailure {
+                println("Error al enviar el correo de restablecimiento: ${it.message}")
+                onResult(false)
+            }
+        }
+    }
+
 
     fun register(email: String, password: String, username: String, profileImageUri: Uri, onResult: (Boolean) -> Unit) {
         if (!isEmailValid(email)) {

@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.devhub.ui.views.HomeScreen
-import com.devhub.ui.views.MainContent
+import com.devhub.ui.components.loginComponents.MainContent
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {

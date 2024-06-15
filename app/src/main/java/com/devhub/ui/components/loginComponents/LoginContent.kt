@@ -1,4 +1,4 @@
-package com.devhub.ui.views
+package com.devhub.ui.components.loginComponents
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -10,9 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.devhub.ui.components.LoginForm
 import com.devhub.ui.components.LogoText
-import com.devhub.ui.components.RegisterForm
 import com.devhub.ui.theme.Blue1
 import com.devhub.ui.theme.Gray1
 import com.devhub.viewmodel.LoginViewModel

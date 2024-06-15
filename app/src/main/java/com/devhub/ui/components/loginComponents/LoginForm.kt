@@ -1,9 +1,6 @@
-package com.devhub.ui.components
+package com.devhub.ui.components.loginComponents
 
-import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
@@ -20,28 +17,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.devhub.R
 import com.devhub.viewmodel.LoginViewModel
+
 @Composable
-fun RegisterForm(
+fun LoginForm(
     navController: NavController,
     loginViewModel: LoginViewModel,
     primaryColor: Color,
     secondaryColor: Color,
-    onSwitchToLogin: () -> Unit
+    onSwitchToRegister: () -> Unit
 ) {
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
-    val usernameState = remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
-    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
-    val imageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-        profileImageUri = it
-    }
 
     OutlinedTextField(
         value = emailState.value,
@@ -69,16 +60,6 @@ fun RegisterForm(
             style = MaterialTheme.typography.bodySmall
         )
     }
-
-    OutlinedTextField(
-        value = usernameState.value,
-        onValueChange = { usernameState.value = it },
-        label = { Text("Nombre de Usuario") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp),
-        shape = MaterialTheme.shapes.medium
-    )
 
     OutlinedTextField(
         value = passwordState.value,
@@ -119,38 +100,14 @@ fun RegisterForm(
     }
 
     Button(
-        onClick = { imageLauncher.launch("image/*") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = MaterialTheme.shapes.medium,
-    ) {
-        Text(
-            "Seleccionar Imagen de Perfil",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-    profileImageUri?.let {
-        Image(
-            painter = rememberAsyncImagePainter(it),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp)
-        )
-    }
-
-    Button(
         onClick = {
-            if (profileImageUri != null) {
-                loginViewModel.register(emailState.value, passwordState.value, usernameState.value, profileImageUri!!) { isSuccess ->
-                    if (isSuccess) {
-                        navController.navigate("home_screen")
-                        Toast.makeText(navController.context, "Cuenta Registrada", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(navController.context, "Registro Fallido", Toast.LENGTH_SHORT).show()
-                    }
+            loginViewModel.login(emailState.value, passwordState.value) { isSuccess ->
+                if (isSuccess) {
+                    navController.navigate("home_screen")
+                    Toast.makeText(navController.context, "Login Correcto", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(navController.context, "Login Fallido", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(navController.context, "Selecciona una imagen de perfil", Toast.LENGTH_SHORT).show()
             }
         },
         modifier = Modifier
@@ -159,7 +116,7 @@ fun RegisterForm(
         shape = MaterialTheme.shapes.medium
     ) {
         Text(
-            "Registrarse",
+            "Iniciar sesión",
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -167,8 +124,8 @@ fun RegisterForm(
     Spacer(modifier = Modifier.height(16.dp))
 
     ClickableText(
-        text = AnnotatedString("¿Ya tienes una cuenta? Inicia sesión aquí"),
-        onClick = { onSwitchToLogin() },
+        text = AnnotatedString("¿No tienes una cuenta? Regístrate aquí"),
+        onClick = { onSwitchToRegister() },
         style = MaterialTheme.typography.bodySmall.copy(color = secondaryColor)
     )
 }
