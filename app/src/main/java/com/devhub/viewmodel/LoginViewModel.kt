@@ -1,6 +1,7 @@
 package com.devhub.viewmodel
 
 import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -13,8 +14,12 @@ class LoginViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
+
     var failedLoginAttempts = 0
         private set
+
+    var username = mutableStateOf<String?>(null)
+    var profileImageUrl = mutableStateOf<String?>(null)
 
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -22,7 +27,15 @@ class LoginViewModel : ViewModel() {
                 auth.signInWithEmailAndPassword(email, password).await()
             }.onSuccess {
                 failedLoginAttempts = 0
-                onResult(true)
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    val userDoc = firestore.collection("users").document(uid).get().await()
+                    username.value = userDoc.getString("username")
+                    profileImageUrl.value = userDoc.getString("profileImageUrl")
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
             }.onFailure {
                 failedLoginAttempts++
                 println("Error al iniciar sesión: ${it.message}")
@@ -30,6 +43,7 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+
 
     fun resetPassword(email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -43,7 +57,6 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
 
     fun register(email: String, password: String, username: String, profileImageUri: Uri, onResult: (Boolean) -> Unit) {
         if (!isEmailValid(email)) {
